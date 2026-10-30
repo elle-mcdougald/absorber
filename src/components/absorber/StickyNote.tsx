@@ -24,12 +24,12 @@ export function StickyNote({
       type="button"
       onClick={onClick}
       className={cn(
-        "sticky-note relative flex aspect-square flex-col justify-between rounded-[6px] p-4 text-left transition-transform hover:z-10 hover:!rotate-0",
+        "sticky-note relative flex aspect-square flex-col justify-between p-4 pt-6 text-left transition-transform hover:z-10 hover:!rotate-0",
         size === "sm" ? "w-40" : "w-full",
         fresh && "animate-note-drop",
         className,
       )}
-      style={{ background: note.color, transform: `rotate(${rot}deg)`, ["--rot" as string]: `${rot}deg`, ...style }}
+      style={{ transform: `rotate(${rot}deg)`, ["--rot" as string]: `${rot}deg`, ...style }}
     >
       <p className={cn("leading-tight", size === "sm" ? "text-xl" : "text-2xl", "line-clamp-5")}>
         {note.type === "question" && <span className="mr-1">?</span>}

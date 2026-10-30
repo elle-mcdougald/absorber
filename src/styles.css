@@ -77,6 +77,8 @@
   --orange: #f07a3a;
   --green: #4e8f57;
   --lilac: #d9b8f0;
+  --postit: #fdf07a;
+  --postit-top: #f6e35c;
 }
 
 @layer base {
@@ -118,8 +120,10 @@
 }
 @utility sticky-note {
   font-family: var(--font-hand);
-  box-shadow: var(--shadow-note);
   color: var(--ink);
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--postit-top) 0%, var(--postit) 22%, var(--postit) 100%);
+  box-shadow: 0 1px 1px oklch(0 0 0 / 0.08), 0 14px 18px -12px oklch(0 0 0 / 0.45), inset 0 -18px 24px -20px oklch(0.4 0.08 85 / 0.35);
 }
 
 @keyframes note-drop {
