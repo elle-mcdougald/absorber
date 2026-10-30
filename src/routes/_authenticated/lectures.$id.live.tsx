@@ -248,7 +248,7 @@ function LiveSession() {
       lecture_id: id, text, timestamp: elapsedRef.current, slide_id: currentSlide?.id ?? null,
       transcript_snippet: snippet || null, type: noteType, color: NOTE_COLORS[noteType],
     }).select().single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setNotes((n) => [...n, data as Note]);
     setFreshIds((f) => new Set(f).add(data.id));
   }
