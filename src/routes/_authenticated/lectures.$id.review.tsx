@@ -207,7 +207,7 @@ function Review() {
                     <p className="mt-3 text-xs font-semibold">Slides {idea.related_slide_ids.map((s) => pad2(slideNum(s) ?? 0)).join(", ")}</p>
                   )}
                 </div>
-              </button>
+              </div>
             ))}
             {!phase && ideas.length === 0 && <p className="text-ink-soft">No main ideas yet — record some of the lecture first.</p>}
           </div>
