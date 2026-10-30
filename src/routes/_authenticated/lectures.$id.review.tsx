@@ -112,6 +112,17 @@ function Review() {
 
   const visibleGroups = query ? groups.filter((g) => g.segs.some(segMatch) || g.notes.some(noteMatch)) : groups;
 
+  async function redrawIdea(idea: Idea) {
+    setDrawing((d) => new Set(d).add(idea.id));
+    try {
+      const { path } = await illustrateFn({ data: { ideaId: idea.id, metaphor: idea.title } });
+      const signed = await signPaths([path]);
+      setUrls((u) => ({ ...u, ...signed }));
+      setIdeas((list) => list.map((i) => (i.id === idea.id ? { ...i, image_url: path } : i)));
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setDrawing((d) => { const n = new Set(d); n.delete(idea.id); return n; }); }
+  }
+
   function jumpTo(elId: string, openKey?: string) {
     if (openKey) setOpen((o) => new Set(o).add(openKey));
     setHighlight(elId);
