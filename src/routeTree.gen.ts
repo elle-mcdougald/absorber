@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedLecturesNewRouteImport } from './routes/_authenticated/lectures.new'
+import { Route as AuthenticatedLecturesIdLiveRouteImport } from './routes/_authenticated/lectures.$id.live'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,18 +41,26 @@ const AuthenticatedLecturesNewRoute =
     path: '/lectures/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLecturesIdLiveRoute =
+  AuthenticatedLecturesIdLiveRouteImport.update({
+    id: '/lectures/$id/live',
+    path: '/lectures/$id/live',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/lectures/new': typeof AuthenticatedLecturesNewRoute
+  '/lectures/$id/live': typeof AuthenticatedLecturesIdLiveRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/lectures/new': typeof AuthenticatedLecturesNewRoute
+  '/lectures/$id/live': typeof AuthenticatedLecturesIdLiveRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -60,12 +69,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/lectures/new': typeof AuthenticatedLecturesNewRoute
+  '/_authenticated/lectures/$id/live': typeof AuthenticatedLecturesIdLiveRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/library' | '/lectures/new'
+  fullPaths: '/' | '/auth' | '/library' | '/lectures/new' | '/lectures/$id/live'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/library' | '/lectures/new'
+  to: '/' | '/auth' | '/library' | '/lectures/new' | '/lectures/$id/live'
   id:
     | '__root__'
     | '/'
@@ -73,6 +83,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/library'
     | '/_authenticated/lectures/new'
+    | '/_authenticated/lectures/$id/live'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -118,17 +129,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLecturesNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/lectures/$id/live': {
+      id: '/_authenticated/lectures/$id/live'
+      path: '/lectures/$id/live'
+      fullPath: '/lectures/$id/live'
+      preLoaderRoute: typeof AuthenticatedLecturesIdLiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedLecturesNewRoute: typeof AuthenticatedLecturesNewRoute
+  AuthenticatedLecturesIdLiveRoute: typeof AuthenticatedLecturesIdLiveRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedLecturesNewRoute: AuthenticatedLecturesNewRoute,
+  AuthenticatedLecturesIdLiveRoute: AuthenticatedLecturesIdLiveRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
