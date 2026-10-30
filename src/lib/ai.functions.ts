@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { embedTexts, transcribeAudio, structuredResponse, generateImage } from "./ai.server";
 
 export const ILLUSTRATION_STYLE =
-  "Minimal hand-drawn line illustration on off-white paper texture. Thick black marker lines, loose gestural strokes, occasional zigzag or sawtooth edges, soft airbrushed black shading, dashed grid accents. Black and white with ONE accent color: orange #F07A3A. No text, no realism. Simple, symbolic, bold. Visual metaphor for: ";
+  "Minimal hand-drawn line illustration on plain white background. Black ink lines only, no shading, no gradients, no gray tones, no fill — pure outline line drawing. Loose gestural strokes, occasional zigzag or sawtooth edges, dashed grid accents. Strictly black and white, no color. No text, no realism. Simple, symbolic, bold. Visual metaphor for: ";
 
 export const embed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
