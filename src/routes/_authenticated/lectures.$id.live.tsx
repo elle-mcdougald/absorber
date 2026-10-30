@@ -47,6 +47,7 @@ function LiveSession() {
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
   const [elapsed, setElapsed] = useState(0);
   const [activity, setActivity] = useState<number[]>([]);
+  const [live, setLive] = useState(0);
   const [state, setState] = useState<"idle" | "recording" | "paused" | "ending">("idle");
   const [draft, setDraft] = useState("");
   const [noteType, setNoteType] = useState<"thought" | "question">("thought");
@@ -57,6 +58,7 @@ function LiveSession() {
   const recRef = useRef<MediaRecorder | null>(null);
   const chunkTimer = useRef<number | null>(null);
   const tickTimer = useRef<number | null>(null);
+  const liveTimer = useRef<number | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const levelRef = useRef(0);
