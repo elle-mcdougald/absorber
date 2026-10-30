@@ -55,11 +55,11 @@ export function Dial({ className }: { className?: string }) {
   );
 }
 
-export function TwoTone({ top, bottom, className }: { top: string; bottom: string; className?: string }) {
+export function TwoTone({ top, bottom, className, bottomClassName }: { top: string; bottom: string; className?: string; bottomClassName?: string }) {
   return (
     <h1 className={cn("headline", className)}>
       <span className="block text-ink">{top}</span>
-      <span className="block text-ink-soft">{bottom}</span>
+      <span className={cn("block text-ink-soft", bottomClassName)}>{bottom}</span>
     </h1>
   );
 }

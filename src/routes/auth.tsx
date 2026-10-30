@@ -56,7 +56,7 @@ function AuthPage() {
     <div className="grid min-h-screen place-items-center p-6">
       <div className="grid w-full max-w-4xl gap-6 md:grid-cols-2">
         <div className="card-flat relative flex min-h-80 flex-col justify-between overflow-hidden bg-teal p-8">
-          <TwoTone top="Absorber" bottom="Listen. Follow. Remember." className="text-4xl" />
+          <TwoTone top="Absorber" bottom="Listen. Follow. Remember." className="text-4xl" bottomClassName="text-ink/70" />
           <DotPattern variant={0} className="absolute -bottom-6 -right-6 size-64" />
         </div>
         <form onSubmit={submit} className="card-flat flex flex-col gap-4 bg-card p-8">
@@ -67,7 +67,7 @@ function AuthPage() {
             {mode === "in" ? "Sign in" : "Sign up"}
           </button>
           <button type="button" onClick={google} className="btn-circle !rounded-full py-3 font-medium">Continue with Google</button>
-          <button type="button" onClick={() => setMode(mode === "in" ? "up" : "in")} className="text-sm text-muted-foreground">
+          <button type="button" onClick={() => setMode(mode === "in" ? "up" : "in")} className="text-sm font-medium text-ink/75 hover:text-ink">
             {mode === "in" ? "No account? Sign up" : "Have an account? Sign in"}
           </button>
         </form>
