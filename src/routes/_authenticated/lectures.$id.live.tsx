@@ -152,11 +152,23 @@ function LiveSession() {
       setElapsed(elapsedRef.current);
       if (elapsedRef.current % 15 === 0) supabase.from("lectures").update({ duration: Math.floor(elapsedRef.current) }).eq("id", id).then();
     }, 1000);
+    // fast sampler: drives the live bouncing bars in the barcode
+    liveTimer.current = window.setInterval(() => {
+      const an = analyserRef.current;
+      if (!an) return;
+      const buf = new Uint8Array(an.fftSize);
+      an.getByteTimeDomainData(buf);
+      let sum = 0;
+      for (const v of buf) sum += ((v - 128) / 128) ** 2;
+      setLive(Math.min(1, Math.sqrt(sum / buf.length) * 6));
+    }, 120);
   }, [id]);
 
   const stopTimers = () => {
     if (tickTimer.current) clearInterval(tickTimer.current);
     if (chunkTimer.current) clearTimeout(chunkTimer.current);
+    if (liveTimer.current) clearInterval(liveTimer.current);
+    setLive(0);
   };
 
   async function begin() {
@@ -350,7 +362,7 @@ function LiveSession() {
           <Square className="size-4 fill-current" />
         </button>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Barcode elapsed={elapsed} total={total} activity={activity} />
+          <Barcode elapsed={elapsed} total={total} activity={activity} live={state === "recording" ? live : 0} />
         </div>
         <p className="num whitespace-nowrap text-4xl">
           <span className="text-ink-soft">{fmtClock(elapsed).slice(0, 3)}</span>{fmtClock(elapsed).slice(3)}
