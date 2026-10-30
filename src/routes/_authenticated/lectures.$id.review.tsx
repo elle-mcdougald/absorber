@@ -174,13 +174,16 @@ function Review() {
         ) : (
           <div className="mt-4 flex snap-x gap-5 overflow-x-auto pb-4">
             {ideas.map((idea, i) => (
-              <button
+              <div
                 key={idea.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => idea.related_slide_ids[0] && jumpTo(`slide-${idea.related_slide_ids[0]}`)}
-                className="card-flat animate-fade-up flex w-80 shrink-0 snap-start flex-col overflow-hidden bg-card text-left transition-transform hover:-translate-y-1"
+                onKeyDown={(e) => { if (e.key === "Enter" && idea.related_slide_ids[0]) jumpTo(`slide-${idea.related_slide_ids[0]}`); }}
+                className="card-flat animate-fade-up flex w-80 shrink-0 cursor-pointer snap-start flex-col overflow-hidden bg-card text-left transition-transform hover:-translate-y-1"
               >
                 <div className="relative grid aspect-square place-items-center bg-muted">
-                  {idea.image_url && urls[idea.image_url] ? (
+                  {idea.image_url && urls[idea.image_url] && !drawing.has(idea.id) ? (
                     <img src={urls[idea.image_url]} alt={idea.title} className="size-full object-cover" />
                   ) : drawing.has(idea.id) ? (
                     <Dial className="size-24 animate-pulse" />
@@ -188,6 +191,14 @@ function Review() {
                     <DotPattern variant={i} className="size-28" />
                   )}
                   <span className="num absolute left-4 top-3 text-3xl">{pad2(i + 1)}</span>
+                  <button
+                    title="Redraw illustration"
+                    onClick={(e) => { e.stopPropagation(); redrawIdea(idea); }}
+                    disabled={drawing.has(idea.id)}
+                    className="btn-circle absolute right-3 top-3 size-9 disabled:opacity-50"
+                  >
+                    <RefreshCw className={cn("size-3.5", drawing.has(idea.id) && "animate-spin")} />
+                  </button>
                 </div>
                 <div className="p-5">
                   <h3 className="headline text-xl">{idea.title}</h3>
