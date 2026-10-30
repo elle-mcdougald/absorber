@@ -15,7 +15,7 @@ export type Note = {
 export function StickyNote({
   note, slideNumber, fresh, className, style, onClick, size = "md",
 }: {
-  note: Note; slideNumber?: number; fresh?: boolean; className?: string; style?: CSSProperties;
+  note: Note; slideNumber?: number | undefined; fresh?: boolean; className?: string; style?: CSSProperties;
   onClick?: () => void; size?: "sm" | "md";
 }) {
   const rot = rotationFor(note.id);

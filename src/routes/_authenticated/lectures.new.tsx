@@ -32,7 +32,7 @@ function NewLecture() {
   });
   const [courseId, setCourseId] = useState<string>("");
   const [newCourse, setNewCourse] = useState("");
-  const [newColor, setNewColor] = useState(PALETTE[0]);
+  const [newColor, setNewColor] = useState<string>(PALETTE[0]!);
   const [title, setTitle] = useState("");
   const [lectureId, setLectureId] = useState<string | null>(null);
   const [thumbs, setThumbs] = useState<string[]>([]);
@@ -41,9 +41,9 @@ function NewLecture() {
   const [consent, setConsent] = useState(false);
 
   async function addCourse() {
-    if (!newCourse.trim()) return;
-    const { data, error } = await supabase.from("courses").insert({ name: newCourse.trim(), color: newColor }).select().single();
-    if (error) return toast.error(error.message);
+    if (!newCourse.trim()) return undefined;
+    const { data, error } = await supabase.from("courses").insert({ name: newCourse.trim(), color: newColor ?? "#4F8C84" }).select().single();
+    if (error) { toast.error(error.message); return undefined; }
     setNewCourse("");
     await refetch();
     setCourseId(data.id);
@@ -77,7 +77,7 @@ function NewLecture() {
       setProgress("Understanding each slide…");
       const { embeddings } = await embedFn({ data: { texts: pages.map((p) => p.text || `Slide ${p.number}`) } });
       const { error } = await supabase.from("slides").insert(pages.map((p, i) => ({
-        lecture_id: id, slide_number: p.number, image_url: paths[i], text: p.text, embedding: embeddings[i],
+        lecture_id: id, slide_number: p.number, image_url: paths[i] ?? null, text: p.text, embedding: embeddings[i] ?? null,
       })));
       if (error) throw error;
       setProgress(`${pages.length} slides ready`);

@@ -80,7 +80,7 @@ export const extractMainIdeas = createServerFn({ method: "POST" })
     const { data: inserted, error } = await sb.from("main_ideas").insert(rows).select("id");
     if (error) throw new Error(error.message);
     return {
-      ideas: (inserted ?? []).map((r, idx) => ({ id: r.id, metaphor: result.ideas[idx].metaphor || result.ideas[idx].title })),
+      ideas: (inserted ?? []).map((r, idx) => ({ id: r.id, metaphor: result.ideas[idx]?.metaphor || result.ideas[idx]?.title || "" })),
     };
   });
 

@@ -6,7 +6,7 @@ export const NOTE_COLORS = { thought: "#B39A82", question: "#F07A3A" } as const;
 export function cosine(a: number[], b: number[]) {
   let dot = 0, na = 0, nb = 0;
   const n = Math.min(a.length, b.length);
-  for (let i = 0; i < n; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+  for (let i = 0; i < n; i++) { const x = a[i]!, y = b[i]!; dot += x * y; na += x * x; nb += y * y; }
   return na && nb ? dot / Math.sqrt(na * nb) : 0;
 }
 
@@ -59,7 +59,7 @@ export function pickSlide(
     return score;
   });
   let best = currentIndex;
-  for (let i = 0; i < scores.length; i++) if (scores[i] > scores[best]) best = i;
+  for (let i = 0; i < scores.length; i++) if (scores[i]! > (scores[best] ?? -1)) best = i;
   if (best === currentIndex) return currentIndex;
-  return scores[best] - (scores[currentIndex] ?? -1) >= margin ? best : currentIndex;
+  return scores[best]! - (scores[currentIndex] ?? -1) >= margin ? best : currentIndex;
 }

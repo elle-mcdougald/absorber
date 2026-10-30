@@ -97,7 +97,7 @@ function LiveSession() {
   // ---------- Audio capture ----------
   const sendChunk = useCallback(async (blob: Blob, start: number, end: number) => {
     const fd = new FormData();
-    const type = (blob.type || "audio/webm").split(";")[0].replace("video/", "audio/");
+    const type = ((blob.type || "audio/webm").split(";")[0] ?? "audio/webm").replace("video/", "audio/");
     const ext = type.includes("mp4") ? "m4a" : type.includes("ogg") ? "ogg" : "webm";
     fd.append("file", new Blob([blob], { type }), `chunk.${ext}`);
     fd.append("name", `chunk.${ext}`);
@@ -210,14 +210,16 @@ function LiveSession() {
   // ---------- Slide matching ----------
   const autoActive = auto && now >= manualUntil;
   useEffect(() => {
-    if (state !== "recording" || !autoActive || elapsed === 0 || elapsed % MATCH_EVERY !== 0) return;
+    if (state !== "recording" || !autoActive || elapsed === 0 || elapsed % MATCH_EVERY !== 0) return undefined;
     const recent = segsRef.current.filter((s) => s.end_time >= elapsedRef.current - 60).map((s) => s.text).join(" ").trim();
-    if (recent.split(/\s+/).length < 8 || slidesRef.current.length < 2) return;
+    if (recent.split(/\s+/).length < 8 || slidesRef.current.length < 2) return undefined;
     embedFn({ data: { texts: [recent] } }).then(({ embeddings }) => {
       if (Date.now() < manualUntil) return;
-      const next = pickSlide(embeddings[0], slidesRef.current, idxRef.current);
+      const q = embeddings[0]; if (!q) return;
+      const next = pickSlide(q, slidesRef.current, idxRef.current);
       if (next !== idxRef.current) setIdx(next);
     }).catch(() => {});
+    return undefined;
   }, [elapsed, state, autoActive, embedFn, manualUntil]);
 
   function manual(delta: number) {
@@ -231,6 +233,10 @@ function LiveSession() {
       if (e.key === "ArrowRight") manual(1);
       if (e.key === "ArrowLeft") manual(-1);
     };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+  useEffect(() => {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
