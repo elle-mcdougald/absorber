@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedLecturesNewRouteImport } from './routes/_authenticated/lectures.new'
 import { Route as AuthenticatedLecturesIdLiveRouteImport } from './routes/_authenticated/lectures.$id.live'
+import { Route as AuthenticatedLecturesIdReviewRouteImport } from './routes/_authenticated/lectures.$id.review'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -47,6 +48,12 @@ const AuthenticatedLecturesIdLiveRoute =
     path: '/lectures/$id/live',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLecturesIdReviewRoute =
+  AuthenticatedLecturesIdReviewRouteImport.update({
+    id: '/lectures/$id/review',
+    path: '/lectures/$id/review',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/library': typeof AuthenticatedLibraryRoute
   '/lectures/new': typeof AuthenticatedLecturesNewRoute
   '/lectures/$id/live': typeof AuthenticatedLecturesIdLiveRoute
+  '/lectures/$id/review': typeof AuthenticatedLecturesIdReviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,6 +69,7 @@ export interface FileRoutesByTo {
   '/library': typeof AuthenticatedLibraryRoute
   '/lectures/new': typeof AuthenticatedLecturesNewRoute
   '/lectures/$id/live': typeof AuthenticatedLecturesIdLiveRoute
+  '/lectures/$id/review': typeof AuthenticatedLecturesIdReviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,12 +79,25 @@ export interface FileRoutesById {
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/lectures/new': typeof AuthenticatedLecturesNewRoute
   '/_authenticated/lectures/$id/live': typeof AuthenticatedLecturesIdLiveRoute
+  '/_authenticated/lectures/$id/review': typeof AuthenticatedLecturesIdReviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/library' | '/lectures/new' | '/lectures/$id/live'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/library'
+    | '/lectures/new'
+    | '/lectures/$id/live'
+    | '/lectures/$id/review'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/library' | '/lectures/new' | '/lectures/$id/live'
+  to:
+    | '/'
+    | '/auth'
+    | '/library'
+    | '/lectures/new'
+    | '/lectures/$id/live'
+    | '/lectures/$id/review'
   id:
     | '__root__'
     | '/'
@@ -84,6 +106,7 @@ export interface FileRouteTypes {
     | '/_authenticated/library'
     | '/_authenticated/lectures/new'
     | '/_authenticated/lectures/$id/live'
+    | '/_authenticated/lectures/$id/review'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -136,6 +159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLecturesIdLiveRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/lectures/$id/review': {
+      id: '/_authenticated/lectures/$id/review'
+      path: '/lectures/$id/review'
+      fullPath: '/lectures/$id/review'
+      preLoaderRoute: typeof AuthenticatedLecturesIdReviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -143,12 +173,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedLecturesNewRoute: typeof AuthenticatedLecturesNewRoute
   AuthenticatedLecturesIdLiveRoute: typeof AuthenticatedLecturesIdLiveRoute
+  AuthenticatedLecturesIdReviewRoute: typeof AuthenticatedLecturesIdReviewRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedLecturesNewRoute: AuthenticatedLecturesNewRoute,
   AuthenticatedLecturesIdLiveRoute: AuthenticatedLecturesIdLiveRoute,
+  AuthenticatedLecturesIdReviewRoute: AuthenticatedLecturesIdReviewRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
