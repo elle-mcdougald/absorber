@@ -1,0 +1,15 @@
+CREATE TABLE public.courses (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL DEFAULT auth.uid(), name text NOT NULL, color text NOT NULL DEFAULT '#4F8C84', created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE public.lectures (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL DEFAULT auth.uid(), course_id uuid NOT NULL REFERENCES public.courses(id) ON DELETE CASCADE, title text NOT NULL, date timestamptz NOT NULL DEFAULT now(), status text NOT NULL DEFAULT 'draft', duration integer NOT NULL DEFAULT 0, created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE public.slides (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL DEFAULT auth.uid(), lecture_id uuid NOT NULL REFERENCES public.lectures(id) ON DELETE CASCADE, slide_number integer NOT NULL, image_url text, text text NOT NULL DEFAULT '', embedding jsonb);
+CREATE TABLE public.transcript_segments (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL DEFAULT auth.uid(), lecture_id uuid NOT NULL REFERENCES public.lectures(id) ON DELETE CASCADE, text text NOT NULL, start_time real NOT NULL, end_time real NOT NULL, matched_slide_id uuid REFERENCES public.slides(id) ON DELETE SET NULL, embedding jsonb);
+CREATE TABLE public.notes (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL DEFAULT auth.uid(), lecture_id uuid NOT NULL REFERENCES public.lectures(id) ON DELETE CASCADE, slide_id uuid REFERENCES public.slides(id) ON DELETE SET NULL, text text NOT NULL, timestamp real NOT NULL DEFAULT 0, transcript_snippet text, color text NOT NULL DEFAULT '#B39A82', type text NOT NULL DEFAULT 'thought', created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE public.main_ideas (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL DEFAULT auth.uid(), lecture_id uuid NOT NULL REFERENCES public.lectures(id) ON DELETE CASCADE, title text NOT NULL, summary text NOT NULL, related_slide_ids uuid[] NOT NULL DEFAULT '{}', image_url text, position integer NOT NULL DEFAULT 0);
+DO $$ DECLARE t text; BEGIN FOREACH t IN ARRAY ARRAY['courses','lectures','slides','transcript_segments','notes','main_ideas'] LOOP
+EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON public.%I TO authenticated', t);
+EXECUTE format('GRANT ALL ON public.%I TO service_role', t);
+EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
+EXECUTE format('CREATE POLICY "own rows" ON public.%I FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id)', t);
+END LOOP; END $$;
+CREATE POLICY "own slide files read" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'slides' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "own slide files write" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'slides' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "own slide files delete" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'slides' AND (storage.foldername(name))[1] = auth.uid()::text);
