@@ -2,8 +2,9 @@
 
 Build a web app called Absorber: a live lecture companion for students. It listens to a lecture, transcribes it in real time, automatically shows the slide being discussed, and lets the student add sticky-note thoughts that are anchored to that exact moment and slide. After the lecture, it generates simple illustrations for the main ideas to help visual learners remember them.
 
-<img width="1419" height="797" alt="Screenshot 2026-11-03 at 17 40 36" src="https://github.com/user-attachments/assets/d33aa6d0-9949-4e0a-9cce-bb998163f6fa" />
 <img width="1414" height="801" alt="Screenshot 2026-11-03 at 17 40 26" src="https://github.com/user-attachments/assets/b0493ee3-f794-45f3-a905-3171dd42e70d" />
+<img width="1419" height="797" alt="Screenshot 2026-11-03 at 17 40 36" src="https://github.com/user-attachments/assets/d33aa6d0-9949-4e0a-9cce-bb998163f6fa" />
+
 
 ## TECH STACK
 - React + Tailwind, Supabase for auth, database, storage, and edge functions.
