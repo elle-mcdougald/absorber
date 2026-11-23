@@ -159,9 +159,9 @@ function Review() {
                 <span className="num text-3xl text-ink-soft">{pad2(i + 1)}</span>
                 <h3 className="headline mt-3 text-xl tracking-[0.04em]">{idea.title}</h3>
                 {idea.bullets.length > 0 ? (
-                  <ul className="mt-3 space-y-2">
+                  <ul className="mt-3 space-y-3">
                     {idea.bullets.map((b, j) => (
-                      <li key={j} className="flex gap-2 text-[17px] leading-relaxed tracking-[0.02em] text-ink-soft">
+                      <li key={j} className="flex gap-2 text-[17px] leading-loose tracking-[0.02em] text-ink-soft">
                         <span className="mt-[9px] size-1.5 shrink-0 rounded-full bg-ink" />
                         {b}
                       </li>
