@@ -157,21 +157,34 @@ function Review() {
                 className="card-flat animate-fade-up flex w-80 shrink-0 cursor-pointer snap-start flex-col bg-card p-6 text-left transition-transform hover:-translate-y-1"
               >
                 <span className="num text-3xl text-ink-soft">{pad2(i + 1)}</span>
-                <h3 className="headline mt-3 text-xl">{idea.title}</h3>
+                <h3 className="headline mt-3 text-xl tracking-[0.04em]">{idea.title}</h3>
                 {idea.bullets.length > 0 ? (
                   <ul className="mt-3 space-y-2">
                     {idea.bullets.map((b, j) => (
-                      <li key={j} className="flex gap-2 text-sm leading-relaxed text-ink-soft">
-                        <span className="mt-[7px] size-1.5 shrink-0 rounded-full bg-ink" />
+                      <li key={j} className="flex gap-2 text-[17px] leading-relaxed tracking-[0.02em] text-ink-soft">
+                        <span className="mt-[9px] size-1.5 shrink-0 rounded-full bg-ink" />
                         {b}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-3 text-sm leading-relaxed text-ink-soft">{idea.summary}</p>
+                  <p className="mt-3 text-sm leading-relaxed tracking-[0.02em] text-ink-soft">{idea.summary}</p>
                 )}
                 {idea.related_slide_ids.length > 0 && (
-                  <p className="mt-4 text-xs font-semibold">Slides {idea.related_slide_ids.map((s) => pad2(slideNum(s) ?? 0)).join(", ")}</p>
+                  <p className="mt-4 text-xs font-semibold text-ink-soft">
+                    Slides{" "}
+                    {idea.related_slide_ids.map((s, j) => (
+                      <span key={s}>
+                        {j > 0 && ", "}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); jumpTo(`slide-${s}`); }}
+                          className="underline-offset-2 hover:text-ink hover:underline"
+                        >
+                          {pad2(slideNum(s) ?? 0)}
+                        </button>
+                      </span>
+                    ))}
+                  </p>
                 )}
               </div>
             ))}
