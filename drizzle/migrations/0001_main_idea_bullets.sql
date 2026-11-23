@@ -1,0 +1,1 @@
+ALTER TABLE public.main_ideas ADD COLUMN bullets jsonb NOT NULL DEFAULT '[]'::jsonb;

@@ -8,6 +8,13 @@
       "when": 1793400297294,
       "tag": "0000_absorber_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795469332199,
+      "tag": "0001_main_idea_bullets",
+      "breakpoints": true
     }
   ]
 }

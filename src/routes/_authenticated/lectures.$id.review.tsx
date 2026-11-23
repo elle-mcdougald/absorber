@@ -4,10 +4,10 @@ import { ArrowLeft, ChevronDown, Search, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { extractMainIdeas, illustrateIdea } from "@/lib/ai.functions";
+import { extractMainIdeas } from "@/lib/ai.functions";
 import { fmtClock, fmtShort, pad2, signPaths } from "@/lib/absorber";
 import { StickyNote, type Note } from "@/components/absorber/StickyNote";
-import { Dial, DotPattern, Rings, TwoTone } from "@/components/absorber/graphics";
+import { Rings, TwoTone } from "@/components/absorber/graphics";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/lectures/$id/review")({
@@ -24,12 +24,11 @@ export const Route = createFileRoute("/_authenticated/lectures/$id/review")({
 
 type Slide = { id: string; slide_number: number; image_url: string | null };
 type Seg = { id: string; text: string; start_time: number; matched_slide_id: string | null };
-type Idea = { id: string; title: string; summary: string; related_slide_ids: string[]; image_url: string | null; position: number };
+type Idea = { id: string; title: string; summary: string; bullets: string[]; related_slide_ids: string[]; position: number };
 
 function Review() {
   const { id } = Route.useParams();
   const extractFn = useServerFn(extractMainIdeas);
-  const illustrateFn = useServerFn(illustrateIdea);
   const [lecture, setLecture] = useState<{ title: string; status: string; duration: number } | null>(null);
   const [slides, setSlides] = useState<Slide[]>([]);
   const [segs, setSegs] = useState<Seg[]>([]);
@@ -37,7 +36,6 @@ function Review() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [phase, setPhase] = useState<string>("");
-  const [drawing, setDrawing] = useState<Set<string>>(new Set());
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [q, setQ] = useState("");
   const [highlight, setHighlight] = useState<string | null>(null);
@@ -47,27 +45,14 @@ function Review() {
     const { data } = await supabase.from("main_ideas").select("*").eq("lecture_id", id).order("position");
     const list = (data ?? []) as Idea[];
     setIdeas(list);
-    const signed = await signPaths(list.map((i) => i.image_url));
-    setUrls((u) => ({ ...u, ...signed }));
     return list;
   }
 
   async function generate() {
     setPhase("Finding the main ideas…");
     try {
-      const { ideas: made } = await extractFn({ data: { lectureId: id } });
+      await extractFn({ data: { lectureId: id } });
       await loadIdeas();
-      setPhase("Drawing illustrations…");
-      setDrawing(new Set(made.map((m) => m.id)));
-      await Promise.all(made.map(async (m) => {
-        try {
-          const { path } = await illustrateFn({ data: { ideaId: m.id, metaphor: m.metaphor } });
-          const signed = await signPaths([path]);
-          setUrls((u) => ({ ...u, ...signed }));
-          setIdeas((list) => list.map((i) => (i.id === m.id ? { ...i, image_url: path } : i)));
-        } catch (e) { toast.error((e as Error).message); }
-        finally { setDrawing((d) => { const n = new Set(d); n.delete(m.id); return n; }); }
-      }));
       await supabase.from("lectures").update({ status: "complete" }).eq("id", id);
       setLecture((l) => (l ? { ...l, status: "complete" } : l));
     } catch (e) {
@@ -111,17 +96,6 @@ function Review() {
   }, [slides, segs, notes]);
 
   const visibleGroups = query ? groups.filter((g) => g.segs.some(segMatch) || g.notes.some(noteMatch)) : groups;
-
-  async function redrawIdea(idea: Idea) {
-    setDrawing((d) => new Set(d).add(idea.id));
-    try {
-      const { path } = await illustrateFn({ data: { ideaId: idea.id, metaphor: idea.title } });
-      const signed = await signPaths([path]);
-      setUrls((u) => ({ ...u, ...signed }));
-      setIdeas((list) => list.map((i) => (i.id === idea.id ? { ...i, image_url: path } : i)));
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setDrawing((d) => { const n = new Set(d); n.delete(idea.id); return n; }); }
-  }
 
   function jumpTo(elId: string, openKey?: string) {
     if (openKey) setOpen((o) => new Set(o).add(openKey));
@@ -180,33 +154,25 @@ function Review() {
                 tabIndex={0}
                 onClick={() => idea.related_slide_ids[0] && jumpTo(`slide-${idea.related_slide_ids[0]}`)}
                 onKeyDown={(e) => { if (e.key === "Enter" && idea.related_slide_ids[0]) jumpTo(`slide-${idea.related_slide_ids[0]}`); }}
-                className="card-flat animate-fade-up flex w-80 shrink-0 cursor-pointer snap-start flex-col overflow-hidden bg-card text-left transition-transform hover:-translate-y-1"
+                className="card-flat animate-fade-up flex w-80 shrink-0 cursor-pointer snap-start flex-col bg-card p-6 text-left transition-transform hover:-translate-y-1"
               >
-                <div className="relative grid aspect-square place-items-center bg-muted">
-                  {idea.image_url && urls[idea.image_url] && !drawing.has(idea.id) ? (
-                    <img src={urls[idea.image_url]} alt={idea.title} className="size-full object-cover" />
-                  ) : drawing.has(idea.id) ? (
-                    <Dial className="size-24 animate-pulse" />
-                  ) : (
-                    <DotPattern variant={i} className="size-28" />
-                  )}
-                  <span className="num absolute left-4 top-3 text-3xl">{pad2(i + 1)}</span>
-                  <button
-                    title="Redraw illustration"
-                    onClick={(e) => { e.stopPropagation(); redrawIdea(idea); }}
-                    disabled={drawing.has(idea.id)}
-                    className="btn-circle absolute right-3 top-3 size-9 disabled:opacity-50"
-                  >
-                    <RefreshCw className={cn("size-3.5", drawing.has(idea.id) && "animate-spin")} />
-                  </button>
-                </div>
-                <div className="p-5">
-                  <h3 className="headline text-xl">{idea.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-soft">{idea.summary}</p>
-                  {idea.related_slide_ids.length > 0 && (
-                    <p className="mt-3 text-xs font-semibold">Slides {idea.related_slide_ids.map((s) => pad2(slideNum(s) ?? 0)).join(", ")}</p>
-                  )}
-                </div>
+                <span className="num text-3xl text-ink-soft">{pad2(i + 1)}</span>
+                <h3 className="headline mt-3 text-xl">{idea.title}</h3>
+                {idea.bullets.length > 0 ? (
+                  <ul className="mt-3 space-y-2">
+                    {idea.bullets.map((b, j) => (
+                      <li key={j} className="flex gap-2 text-sm leading-relaxed text-ink-soft">
+                        <span className="mt-[7px] size-1.5 shrink-0 rounded-full bg-ink" />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-3 text-sm leading-relaxed text-ink-soft">{idea.summary}</p>
+                )}
+                {idea.related_slide_ids.length > 0 && (
+                  <p className="mt-4 text-xs font-semibold">Slides {idea.related_slide_ids.map((s) => pad2(slideNum(s) ?? 0)).join(", ")}</p>
+                )}
               </div>
             ))}
             {!phase && ideas.length === 0 && <p className="text-ink-soft">No main ideas yet — record some of the lecture first.</p>}

@@ -1,10 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { embedTexts, transcribeAudio, structuredResponse, generateImage } from "./ai.server";
-
-export const ILLUSTRATION_STYLE =
-  "Minimal hand-drawn line illustration on plain white background. Black ink lines only, no shading, no gradients, no gray tones, no fill — pure outline line drawing. Loose gestural strokes, occasional zigzag or sawtooth edges, dashed grid accents. Strictly black and white, no color. No text, no realism. Simple, symbolic, bold. Visual metaphor for: ";
+import { embedTexts, transcribeAudio, structuredResponse } from "./ai.server";
 
 export const embed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -25,7 +22,7 @@ export const transcribeChunk = createServerFn({ method: "POST" })
     return { text: await transcribeAudio(data.file, data.name) };
   });
 
-type Ideas = { ideas: { title: string; summary: string; metaphor: string; slide_numbers: number[] }[] };
+type Ideas = { ideas: { title: string; bullets: string[]; slide_numbers: number[] }[] };
 
 export const extractMainIdeas = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -42,7 +39,7 @@ export const extractMainIdeas = createServerFn({ method: "POST" })
 
     const result = await structuredResponse<Ideas>({
       instructions:
-        "You help students remember lectures. Extract the 3 to 6 main ideas of the lecture. For each: a short title (max 6 words), a 2-3 sentence plain-language summary, a simple concrete visual metaphor (one short phrase, no text in image), and the slide numbers it relates to.",
+        "You help students remember lectures. Extract the 3 to 6 main ideas of the lecture. For each: a short title (max 6 words), 3 to 5 core bullet points (each one short plain-language sentence a student should remember), and the slide numbers it relates to.",
       input: `SLIDES:\n${slideText || "(none)"}\n\nTRANSCRIPT:\n${transcript || "(none)"}`,
       schemaName: "main_ideas",
       schema: {
@@ -55,11 +52,10 @@ export const extractMainIdeas = createServerFn({ method: "POST" })
             items: {
               type: "object",
               additionalProperties: false,
-              required: ["title", "summary", "metaphor", "slide_numbers"],
+              required: ["title", "bullets", "slide_numbers"],
               properties: {
                 title: { type: "string" },
-                summary: { type: "string" },
-                metaphor: { type: "string" },
+                bullets: { type: "array", items: { type: "string" } },
                 slide_numbers: { type: "array", items: { type: "integer" } },
               },
             },
@@ -73,28 +69,12 @@ export const extractMainIdeas = createServerFn({ method: "POST" })
     const rows = result.ideas.slice(0, 6).map((i, idx) => ({
       lecture_id: data.lectureId,
       title: i.title,
-      summary: i.summary,
+      summary: i.bullets.join(" "),
+      bullets: i.bullets,
       position: idx,
       related_slide_ids: i.slide_numbers.map((n) => byNum.get(n)).filter((x): x is string => !!x),
     }));
-    const { data: inserted, error } = await sb.from("main_ideas").insert(rows).select("id");
+    const { error } = await sb.from("main_ideas").insert(rows);
     if (error) throw new Error(error.message);
-    return {
-      ideas: (inserted ?? []).map((r, idx) => ({ id: r.id, metaphor: result.ideas[idx]?.metaphor || result.ideas[idx]?.title || "" })),
-    };
-  });
-
-export const illustrateIdea = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ ideaId: z.string().uuid(), metaphor: z.string().max(500) }).parse(d))
-  .handler(async ({ data, context }) => {
-    const sb = context.supabase;
-    const { data: idea } = await sb.from("main_ideas").select("id, title").eq("id", data.ideaId).single();
-    if (!idea) throw new Error("Idea not found");
-    const bytes = await generateImage(ILLUSTRATION_STYLE + `${idea.title} — ${data.metaphor}`);
-    const path = `${context.userId}/ideas/${idea.id}.png`;
-    const { error: upErr } = await sb.storage.from("slides").upload(path, bytes, { contentType: "image/png", upsert: true });
-    if (upErr) throw new Error(upErr.message);
-    await sb.from("main_ideas").update({ image_url: path }).eq("id", idea.id);
-    return { path };
+    return { count: rows.length };
   });

@@ -81,6 +81,7 @@ export type Database = {
       }
       main_ideas: {
         Row: {
+          bullets: Json
           id: string
           image_url: string | null
           lecture_id: string
@@ -91,6 +92,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          bullets?: Json
           id?: string
           image_url?: string | null
           lecture_id: string
@@ -101,6 +103,7 @@ export type Database = {
           user_id?: string
         }
         Update: {
+          bullets?: Json
           id?: string
           image_url?: string | null
           lecture_id?: string
