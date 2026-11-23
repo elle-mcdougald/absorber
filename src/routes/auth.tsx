@@ -73,7 +73,7 @@ function AuthPage() {
   return (
     <div className="grid min-h-screen place-items-center p-6">
       <div className="grid w-full max-w-4xl gap-6 md:grid-cols-2">
-        <div className="card-flat relative flex min-h-80 flex-col justify-between overflow-hidden bg-teal p-8">
+        <div className="card-flat relative flex min-h-80 flex-col justify-between overflow-hidden bg-periwinkle p-8">
           <TwoTone top="Absorber" bottom="Listen. Follow. Remember." className="text-4xl" bottomClassName="text-ink/70" />
           <DotPattern variant={0} className="absolute -bottom-6 -right-6 size-64" />
         </div>

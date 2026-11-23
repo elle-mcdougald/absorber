@@ -42,7 +42,7 @@ function NewLecture() {
 
   async function addCourse() {
     if (!newCourse.trim()) return undefined;
-    const { data, error } = await supabase.from("courses").insert({ name: newCourse.trim(), color: newColor ?? "#4F8C84" }).select().single();
+    const { data, error } = await supabase.from("courses").insert({ name: newCourse.trim(), color: newColor ?? "#B0C9E9" }).select().single();
     if (error) { toast.error(error.message); return undefined; }
     setNewCourse("");
     await refetch();

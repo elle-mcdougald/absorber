@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export const PALETTE = ["#4F8C84", "#B89A9A", "#B39A82", "#F07A3A", "#4E8F57", "#D9B8F0", "#FFFFFF"];
-export const NOTE_COLORS = { thought: "#B39A82", question: "#F07A3A" } as const;
+export const PALETTE = ["#B0C9E9", "#BF3432", "#E38B3C", "#D375A8", "#622F33", "#FFFFFF"];
+export const NOTE_COLORS = { thought: "#D375A8", question: "#BF3432" } as const;
 
 export function cosine(a: number[], b: number[]) {
   let dot = 0, na = 0, nb = 0;
