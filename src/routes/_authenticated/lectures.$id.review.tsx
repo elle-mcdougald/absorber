@@ -154,7 +154,7 @@ function Review() {
                 tabIndex={0}
                 onClick={() => idea.related_slide_ids[0] && jumpTo(`slide-${idea.related_slide_ids[0]}`)}
                 onKeyDown={(e) => { if (e.key === "Enter" && idea.related_slide_ids[0]) jumpTo(`slide-${idea.related_slide_ids[0]}`); }}
-                className="card-flat animate-fade-up flex w-80 shrink-0 cursor-pointer snap-start flex-col bg-card p-6 text-left transition-transform hover:-translate-y-1"
+                className="card-flat animate-fade-up flex w-96 shrink-0 cursor-pointer snap-start flex-col bg-card p-6 text-left transition-transform hover:-translate-y-1"
               >
                 <span className="num text-3xl text-ink-soft">{pad2(i + 1)}</span>
                 <h3 className="headline mt-3 text-xl tracking-[0.04em]">{idea.title}</h3>
